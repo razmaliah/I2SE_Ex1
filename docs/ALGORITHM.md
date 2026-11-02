@@ -136,9 +136,12 @@ Done for all planes before any projection (FR-10). Checks, in order (FR-9):
 2. All values are finite numbers.
 3. Triangle: `|dist(a,b) − dist(a,c)| < EPS`, and the points are not on one line
    (`|(b − a) × (c − a)| > EPS`).
-4. Trapezoid: `|dist(a1,b) − dist(a2,c)| < EPS`; `T ≤ B`; `a2` is on the plane of `a1, b, c`
-   (distance `< EPS`); the top is parallel to the base and points the same way
-   (`(a2 − a1)/T · u > 1 − EPS`), so the legs do not cross; `h > EPS`.
+4. Trapezoid: `|dist(a1,b) − dist(a2,c)| < EPS`; `B > EPS` and `h > EPS` (not flat);
+   `a2` is on the plane of `a1, b, c` (distance `< EPS`); `a2` is on the line through `a1`
+   parallel to the base (distance `< EPS`), so the top is parallel to the base;
+   `(a2 − a1)·u ≥ −EPS`, so the top points the same way and the legs do not cross; `T ≤ B`.
+   Distances, not angles, are compared with EPS, so the tolerance does not grow with the size of
+   the plane.
    With equal legs and parallel sides, the shape is either an isosceles trapezoid or a
    parallelogram (`T = B`); both are valid.
 5. Image size: `H` and `W` are at most twice the diagonal of the volume (FR-19a).

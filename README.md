@@ -45,13 +45,14 @@ python Ex0.py <file.nrrd> <file.csv> <file.mp4> [--strict]
 - `file.mp4` – the output video.
 - `--strict` – stop without writing a video if any plane is invalid.
 
-## Repository layout (planned)
+## Repository layout
 
 | Path | Content |
 |---|---|
-| `Ex0.py` | Demo entry point |
-| `projection/` | Source code |
-| `tests/` | Automated tests |
+| `Ex0.py` | Demo entry point (in progress) |
+| `projection/` | Source code (see [DESIGN.md](docs/DESIGN.md)) |
+| `tests/` | Automated tests, run with `pytest` |
+| `prototype/` | The first loop-based prototype, kept for history |
 | `docs/` | SRS, algorithm, data set, test strategy, experiment |
 | `demo/` | Demo CSV files and output videos |
 | `data/` | NRRD files (not committed, see `docs/DATASET.md`) |
@@ -60,11 +61,19 @@ python Ex0.py <file.nrrd> <file.csv> <file.mp4> [--strict]
 
 - [Software Requirements Specification](docs/SRS.md)
 - [Algorithm](docs/ALGORITHM.md)
+- [Design](docs/DESIGN.md)
 - [Data set](docs/DATASET.md)
 - [Test strategy](docs/TESTING.md)
 - Experiment and results – in progress
 
 ## Status
 
-Planning. An early loop-based prototype (`sample_line.py`, `projection.py`) is kept as the
-reference implementation for testing.
+Implementation. Done: volume, planes (validation and geometry), reference and fast projectors,
+with tests. Next: CSV reader, intensity mapping, video and the demo program.
+
+## Setup
+
+```
+pip install -r requirements.txt
+pytest
+```
