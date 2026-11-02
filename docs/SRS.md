@@ -95,13 +95,20 @@ such detail is decided here, with the reason for the decision.
 
 ## 4. Projection
 
-- **FR-14** Each valid plane is projected using the assignment's algorithm: rows run from the
-  apex (`a`, or the top `a1→a2`) to the base, in steps of length 1; each row runs between the two
-  legs in steps of length 1.
+- **FR-14** Each valid plane is projected row by row, from the apex (`a`, or the top `a1→a2`)
+  to the base. Each row is parallel to the base and runs between the two legs.
+- **FR-14a** The image is not distorted: rows are 1 voxel apart, measured perpendicular to the
+  base, and samples in a row are 1 voxel apart. So the image height is the trapezoid's true
+  height `h`, not the leg length.
+  - *Reason:* the assignment's algorithm steps 1 voxel along the leg. Since the leg is slanted,
+    rows end up less than 1 voxel apart and the image is stretched vertically by `L / h`
+    (about 12% for row 1 of `lecturer_example.csv`, and without limit for a flat trapezoid).
+    The assignment's algorithm is an example, not a requirement; an undistorted image is what
+    the user needs.
 - **FR-15** Both end points of every row are included (`x1 ≤ d12`), so a row of length `d` has
   `floor(d) + 1` samples.
-- **FR-16** The point on row `y` of each leg is computed directly (`a1 = a + y·v_ab`), not by
-  adding steps, so rounding errors do not accumulate.
+- **FR-16** The points of row `y` on the legs are computed directly from `y`, not by adding
+  steps, so rounding errors do not accumulate.
 - **FR-17** Sampling uses the **nearest voxel** (rounding each coordinate).
   - *Reason:* speed, and the image shows only values that were actually measured.
     Interpolation creates values that were never measured.

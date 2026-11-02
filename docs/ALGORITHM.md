@@ -23,20 +23,31 @@ base (that is what makes the trapezoid isosceles). Each such line is one row of 
 
 - Leg directions (unit vectors): `v1 = (b − a1) / L`, `v2 = (c − a2) / L`.
 - Row direction (unit vector, the same for all rows): `u = (c − b) / B`.
-- Row `y` (`y = 0` at the top) runs from `p1(y) = a1 + y·v1` to `p2(y) = a2 + y·v2` (FR-16).
+- True height (distance between the top and the base lines):
+  `h = |w − (w·u)·u|`, where `w = b − a1`.
+- **Row spacing.** Row `y` is `y` voxels below the top, measured perpendicular to the base. To
+  get there, each walker moves `y·s` along its leg, where `s = L / h` (FR-14a).
+- Row `y` (`y = 0` at the top) runs from `p1(y) = a1 + y·s·v1` to `p2(y) = a2 + y·s·v2` (FR-16).
 - Its length is `d(y) = dist(p1(y), p2(y))`, growing linearly from `T` to `B`.
-- Image size: `H = floor(L) + 1` rows, `W = floor(B) + 1` columns. The `+1` comes from including
+- Image size: `H = floor(h) + 1` rows, `W = floor(B) + 1` columns. The `+1` comes from including
   both end points (FR-15).
+
+**Why not `H = L` as in the assignment.** Stepping 1 voxel along a slanted leg moves the row
+only `h / L < 1` voxel down, while pixels in a row are 1 voxel apart. The image would be
+stretched vertically by `L / h`: about 15% for an equilateral triangle, 12% for row 1 of
+`lecturer_example.csv` (`L = 447`, `h = 400`), and without limit as the trapezoid gets flat.
+With `s = L / h` rows and columns are both 1 voxel apart, so the image keeps the true proportions.
 
 ## 3. Reference algorithm (loops)
 
-This is the assignment's algorithm with the decisions of the SRS. It is simple and slow, and it
+This is the assignment's algorithm with the decisions of the SRS, including the true row
+spacing `s`. It is simple and slow, and it
 is kept as the reference that the fast version is tested against (NFR-2).
 
 ```
 for y in 0 .. H−1:
-    p1 = a1 + y·v1
-    p2 = a2 + y·v2
+    p1 = a1 + y·s·v1
+    p2 = a2 + y·s·v2
     d  = dist(p1, p2)
     n  = floor(d) + 1                  # samples in this row (FR-15)
     start = (W − n) // 2               # center the row; odd margins go right (FR-18)
@@ -86,7 +97,8 @@ A prototype of this algorithm was compared with the reference algorithm (section
 | Large triangle around a full slice | 1118 × 1000 | – | 49 FPS |
 
 The speed depends on the number of pixels in the image, not on the size of the volume. The
-final measurement is part of the experiment.
+prototype used the assignment's row spacing (`H = L`); with the true height (FR-14a) images have
+fewer rows, so they are at least as fast. The final measurement is part of the experiment.
 
 ## 5. Validation of a plane
 
