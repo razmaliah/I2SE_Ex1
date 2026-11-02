@@ -13,7 +13,7 @@ such detail is decided here, with the reason for the decision.
 |---|---|
 | Volume | The 3D matrix `M[x][y][z]` read from the NRRD file |
 | Voxel | One entry of the volume |
-| Plane | One CSV row: an isosceles triangle (3 points) or an isosceles trapezoid (4 points) |
+| Plane | One CSV row: an isosceles triangle (3 points), or an isosceles trapezoid or a parallelogram (4 points) |
 | Frame | The 2D image of one plane, one frame of the output video |
 | EPS | Tolerance for geometric checks, `0.001` |
 
@@ -69,6 +69,8 @@ such detail is decided here, with the reason for the decision.
      `a1, b, c` is `≥ EPS`).
   8. Trapezoid: the top is not parallel to the base, or the legs cross (the top and the base
      point in opposite directions). Equal legs alone do not make an isosceles trapezoid.
+     A parallelogram (equal legs, top equal and parallel to the base) is valid, also when its
+     legs are slanted; it is drawn with its true shape (FR-18).
   9. The image of the plane is larger than the maximum frame size (FR-19a).
   - *Note on item 6:* the algorithm itself would work with a top longer than the base (the image
     would narrow toward the bottom). The plane is rejected because the assignment's definition
@@ -95,25 +97,28 @@ such detail is decided here, with the reason for the decision.
 
 ## 4. Projection
 
-- **FR-14** Each valid plane is projected row by row, from the apex (`a`, or the top `a1→a2`)
-  to the base. Each row is parallel to the base and runs between the two legs.
-- **FR-14a** The image is not distorted: rows are 1 voxel apart, measured perpendicular to the
-  base, and samples in a row are 1 voxel apart. So the image height is the trapezoid's true
-  height `h`, not the leg length.
+- **FR-14** The image of a plane is a grid laid flat on the plane: columns run along the base,
+  rows run perpendicular to it, from the top (`a`, or `a1→a2`) to the base. Pixels between the
+  two legs show the volume; the others are black margin.
+- **FR-14a** The image is not distorted: rows and columns are both 1 voxel apart. So the image
+  height is the shape's true height `h`, not the leg length.
   - *Reason:* the assignment's algorithm steps 1 voxel along the leg. Since the leg is slanted,
     rows end up less than 1 voxel apart and the image is stretched vertically by `L / h`
     (about 12% for row 1 of `lecturer_example.csv`, and without limit for a flat trapezoid).
     The assignment's algorithm is an example, not a requirement; an undistorted image is what
     the user needs.
-- **FR-15** Both end points of every row are included (`x1 ≤ d12`), so a row of length `d` has
-  `floor(d) + 1` samples.
-- **FR-16** The points of row `y` on the legs are computed directly from `y`, not by adding
-  steps, so rounding errors do not accumulate.
+- **FR-15** The ends of every row are included (`x1 ≤ d12`): a pixel exactly on a leg belongs
+  to the shape. The image has `floor(h) + 1` rows and `floor(width) + 1` columns.
+- **FR-16** Every point is computed directly from its row and column, not by adding steps, so
+  rounding errors do not accumulate.
 - **FR-17** Sampling uses the **nearest voxel** (rounding each coordinate).
   - *Reason:* speed, and the image shows only values that were actually measured.
     Interpolation creates values that were never measured.
-- **FR-18** Each row is centered horizontally. When it cannot be centered exactly, it is shifted
-  half a pixel to the left.
+- **FR-18** Each row is placed at its true position, so the image shows the true shape: an
+  isosceles triangle or trapezoid comes out symmetric (centered rows), and a slanted
+  parallelogram comes out slanted.
+  - *Reason:* centering every row would turn a slanted parallelogram into a rectangle, a
+    distortion like the one FR-14a avoids.
 
 ## 5. Output
 

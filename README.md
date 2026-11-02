@@ -9,7 +9,8 @@ whose entries are unsigned integers (8, 16 or 32 bit). Viewers such as 3D Slicer
 as three fixed slices (X, Y, Z). We want to see the volume along **any** plane.
 
 Given a volume `M` and a plane `p`, compute the 2D image of `p` inside `M`. The plane is given by
-3 points (an isosceles triangle) or by 4 points (an isosceles trapezoid). For a list of planes,
+3 points (an isosceles triangle) or by 4 points (an isosceles trapezoid or a
+parallelogram). For a list of planes,
 produce a video with one frame per plane.
 
 As the assignment states, the problem is not well defined for implementation. The decisions
