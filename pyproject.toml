@@ -1,0 +1,9 @@
+[project]
+name = "plane-projection"
+version = "0.1.0"
+description = "Plane projection of a 3D NRRD volume (I2SE Ex1)"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
