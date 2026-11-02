@@ -32,7 +32,9 @@ such detail is decided here, with the reason for the decision.
 
 - **FR-4** The first line is a header: `Number of Points (3 or 4),x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4`.
 - **FR-5** Each following line is one plane. It starts with the number of points, 3 or 4,
-  followed by the coordinates. For a triangle the last three columns are empty.
+  followed by the coordinates. For a triangle the last three columns are empty (or missing).
+  Empty lines and lines starting with `#` (comments) are ignored; line numbers in messages are
+  the line numbers in the file.
 - **FR-6** Point order:
   - Triangle: `a, b, c`, where `a` is the apex and `b→c` is the base.
   - Trapezoid: `a1, b, a2, c`, where the legs are `a1→b` and `a2→c`, `a1→a2` is the top and
@@ -146,7 +148,8 @@ such detail is decided here, with the reason for the decision.
 ### 5.3 Video
 
 - **FR-21** The video has one frame per CSV plane, in the CSV order.
-- **FR-22** The video is grayscale, in MP4 format.
+- **FR-22** The video is grayscale, in MP4 format (H.264). The frame height and width are
+  rounded up to even numbers, which the format requires; the extra row or column is black.
 - **FR-22a** The playback rate is 10 frames per second by default, and can be changed from the
   command line.
   - *Reason:* a slower rate lets the viewer see each plane. This is the playback rate only; it
@@ -155,9 +158,12 @@ such detail is decided here, with the reason for the decision.
 ### 5.4 Report
 
 - **FR-23** After the run the program prints:
-  - the time to load the volume, in seconds;
-  - **projection FPS**: frames per second for projection and intensity mapping;
+  - the **load time**, in seconds: reading the volume and mapping it to `0..255`;
+  - **projection FPS**: frames per second for projecting and placing each frame;
   - **end-to-end FPS**: frames per second including writing the video.
+  - *Note:* intensity mapping is done once for the whole volume when it is loaded, not per
+    frame. With nearest-voxel sampling this gives exactly the same pixels, so its cost is part of
+    the load time.
 
 ## 6. Non-functional requirements
 
@@ -167,4 +173,4 @@ such detail is decided here, with the reason for the decision.
   loop-based reference implementation.
 - **NFR-3 Robustness:** no input may crash the program with an unhandled exception.
 - **NFR-4 Code quality:** object-oriented design, PEP 8, docstrings, automated tests.
-- **NFR-5 Environment:** Python 3.10+, with NumPy and common libraries for NRRD and MP4.
+- **NFR-5 Environment:** Python 3.10+, with NumPy, `pynrrd` (NRRD) and `imageio-ffmpeg` (MP4).

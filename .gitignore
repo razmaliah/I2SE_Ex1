@@ -16,3 +16,6 @@ venv/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Output videos (selected ones are added for the experiment)
+demo/output/
