@@ -37,19 +37,31 @@ Out of scope:
 ## Usage
 
 ```
-python Ex0.py <file.nrrd> <file.csv> <file.mp4> [--strict]
+python Ex0.py <file.nrrd> <file.csv> <file.mp4> [--strict] [--fps N] [--percentiles LOW HIGH]
 ```
 
 - `file.nrrd` – the input volume.
 - `file.csv` – the list of planes.
 - `file.mp4` – the output video.
 - `--strict` – stop without writing a video if any plane is invalid.
+- `--fps N` – playback rate of the video (default 10).
+- `--percentiles LOW HIGH` – map gray levels by percentiles of the volume (e.g. `1 99`)
+  instead of its minimum and maximum.
+
+Example, with the data files in `data/`:
+
+```
+python Ex0.py data/MRHead_1.nrrd demo/edge_cases.csv demo/output/edge_cases.mp4
+```
+
+Exit codes: `0` success (possibly with warnings), `1` the run stopped on an error, `2` bad
+arguments.
 
 ## Repository layout
 
 | Path | Content |
 |---|---|
-| `Ex0.py` | Demo entry point (in progress) |
+| `Ex0.py` | Demo entry point |
 | `projection/` | Source code (see [DESIGN.md](docs/DESIGN.md)) |
 | `tests/` | Automated tests, run with `pytest` |
 | `prototype/` | The first loop-based prototype, kept for history |
@@ -68,8 +80,7 @@ python Ex0.py <file.nrrd> <file.csv> <file.mp4> [--strict]
 
 ## Status
 
-Implementation. Done: volume, planes (validation and geometry), reference and fast projectors,
-with tests. Next: CSV reader, intensity mapping, video and the demo program.
+Implementation complete, with tests. Next: the experiment.
 
 ## Setup
 

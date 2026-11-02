@@ -150,18 +150,22 @@ Done for all planes before any projection (FR-10). Checks, in order (FR-9):
 
 ```
 1. Read and check the arguments.                           (file-level errors stop: FR-8)
-2. Load the volume. Compute its value range for intensity mapping (FR-20). Pad it (4.1).
+2. Load the volume, map it to 0..255 once (FR-20), pad the   ← load time
+   mapped volume with zeros (4.1).
 3. Read the CSV and validate all planes (section 5). Print all warnings (FR-10).
    Strict mode with any invalid plane, or no valid plane: stop (FR-8, FR-12).
-4. Frame size = the largest H and W over the valid planes (FR-19).
+4. Frame size = the largest H and W over the valid planes, rounded up to even (FR-19, FR-22).
 5. For each plane, in CSV order:                           ← projection FPS is measured here
-     valid:   project (section 4), map to 0..255, center in the frame
+     valid:   project the mapped volume (section 4), center in the frame
      invalid: black frame (FR-11)
      write the frame to the video                          ← end-to-end FPS includes this
 6. Print load time, projection FPS and end-to-end FPS (FR-23).
 ```
 
-**Intensity mapping (FR-20):** `out = clip((v − lo) / (hi − lo) · 255, 0, 255)`, where `lo`
-and `hi` are the volume's minimum and maximum (or its percentiles). Pixels outside the volume
-and margin pixels are set to 0 after mapping, so they are black also when the volume has
-negative values (FR-13).
+**Intensity mapping (FR-20):** `out = round(clip((v − lo) / (hi − lo) · 255, 0, 255))`, where
+`lo` and `hi` are the volume's minimum and maximum (or its percentiles); a volume with a single
+value is white. The mapping is applied to the whole volume once, before any projection. With
+nearest-voxel sampling every pixel is one voxel's value, so mapping first gives exactly the same
+images as mapping every frame, at a one-time cost. The zero border is added after mapping, so
+points outside the volume and margin pixels are black also when the volume has negative values
+(FR-13), and the projector reads 8-bit voxels, which is faster.

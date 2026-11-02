@@ -30,6 +30,8 @@ volumes generated with AI tools; they are not real scans.
 
 ## 2. Plane lists (CSV)
 
+The class CSV files are in `demo/class/`; our own are in `demo/`.
+
 | File | Planes | Content | Source |
 |---|---|---|---|
 | `lecturer_example.csv` | 4 | Two triangles and two trapezoids, one of them invalid (not isosceles) | Lecturer |
