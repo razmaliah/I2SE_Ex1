@@ -60,17 +60,15 @@ Run `Ex0.py` as the user would, on small generated files:
 - File-level errors: clear message, non-zero exit code, no video (FR-8).
 - The report prints load time, projection FPS and end-to-end FPS (FR-23).
 
-## 6. Performance test
+## 6. Performance measurement
 
-On `croissant.nrrd` (500³, `uint8`) with `croissant.csv`, and on a random 500³ volume with
-planes of several sizes (including the diagonal plane and a plane covering a full slice):
+The automated tests check correctness only. Speed is measured separately, with a benchmark
+script, on `croissant.nrrd` (500³, `uint8`) with `croissant.csv`, and on a random 500³ volume
+with planes of several sizes (including the diagonal plane and a plane covering a full slice).
 
-- Projection FPS must be at least 30 (the assignment's minimum); the target is 100 (NFR-1).
+- The target is a projection FPS of at least 100 (NFR-1); the assignment's minimum is 30.
 - The measured numbers, the machine they were measured on, and the image sizes are reported in
   the experiment.
-
-The automated test checks only the minimum (30 FPS), so it does not fail on a slower machine;
-the target is checked and reported in the experiment.
 
 ## 7. Demo and experiment
 
@@ -82,6 +80,7 @@ The demo of the assignment (`python Ex0.py file.nrrd file.csv file.mp4`) is run 
 | `MRHead_1.nrrd` | `head.csv` | Anatomy looks right; axis-aligned frames match the slices in 3D Slicer |
 | `croissant.nrrd` | `croissant.csv` | Performance on 500³; planes partly outside the volume |
 | `onion`, `biscuit_cake`, `swiss_roll` | their CSVs | 8, 16 and 32 bit volumes |
+| `MRHead_1.nrrd` | `demo/edge_cases.csv` (ours) | One plane per edge case of section 4 and per rule of FR-9, each with the result the SRS expects |
 
 The videos are checked by eye against the 3D Slicer views, and the results are written in the
 experiment document.
@@ -100,6 +99,6 @@ experiment document.
 | FR-19, FR-19a (frame size) | 1, 4 |
 | FR-20 (intensity) | 1 |
 | FR-21 – FR-23 (video, report) | 5 |
-| NFR-1 (performance) | 6 |
+| NFR-1 (performance) | 6 (benchmark, reported in the experiment) |
 | NFR-2 (correctness of the fast version) | 3 |
 | NFR-3 (robustness) | 4 |

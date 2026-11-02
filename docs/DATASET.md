@@ -36,11 +36,10 @@ volumes generated with AI tools; they are not real scans.
 | `head.csv` | 280 | Sweeps through `MRHead_1.nrrd`: axis-aligned rectangles and oblique planes | Class data set |
 | `croissant.csv` | 100 | Triangles through `croissant.nrrd`, partly outside the volume | Class data set |
 | `onion.csv`, `biscuit_cake.csv`, `swiss_roll.csv` | 120 each | The same plane sweep for the three 256 × 256 × 130 volumes | Class data set |
+| `demo/edge_cases.csv` | – | Edge cases and invalid planes, each with the result our SRS expects | Ours |
 
-`edge_cases.csv` from the class folder is **not used**: it refers to a volume that is not part
-of the set (`dice.nrrd`) and its expected results follow another design (for example, a triangle
-that is not isosceles is drawn instead of rejected). Our own edge cases are defined in the
-[test strategy](TESTING.md).
+Our own files (CSV files and synthetic volumes) are created whenever a case is not covered by
+the files above.
 
 ## 3. Synthetic test volumes
 
