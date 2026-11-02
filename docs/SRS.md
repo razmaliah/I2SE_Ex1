@@ -67,7 +67,8 @@ such detail is decided here, with the reason for the decision.
   6. Trapezoid: `dist(a1,a2) > dist(b,c)` (top longer than base).
   7. Trapezoid: the four points are not on one plane (distance of `a2` from the plane of
      `a1, b, c` is `≥ EPS`).
-  8. Trapezoid: the legs cross (the top and the base point in opposite directions).
+  8. Trapezoid: the top is not parallel to the base, or the legs cross (the top and the base
+     point in opposite directions). Equal legs alone do not make an isosceles trapezoid.
   9. The image of the plane is larger than the maximum frame size (FR-19a).
   - *Note on item 6:* the algorithm itself would work with a top longer than the base (the image
     would narrow toward the bottom). The plane is rejected because the assignment's definition

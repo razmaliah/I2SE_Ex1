@@ -58,7 +58,7 @@ python Ex0.py <file.nrrd> <file.csv> <file.mp4> [--strict]
 ## Documents
 
 - [Software Requirements Specification](docs/SRS.md)
-- Algorithm – in progress
+- [Algorithm](docs/ALGORITHM.md)
 - Data set – in progress
 - Test strategy – in progress
 - Experiment and results – in progress
