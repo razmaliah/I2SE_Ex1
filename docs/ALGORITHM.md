@@ -100,6 +100,9 @@ This removes the per-pixel "is it inside?" test, which was the most expensive st
 
 ### 4.2 Per frame
 
+Work arrays are allocated once per frame and filled in place, and offsets are 32-bit integers
+(the padded volume has fewer than 2³¹ voxels); this keeps the memory traffic per pixel low.
+
 1. **Row data** (`H` values each): `left(y)` and `right(y)`.
 2. **Shape mask** (`H × W`): `left(y) − EPS ≤ x ≤ right(y) + EPS`.
 3. **3D point of every pixel**, one coordinate at a time:
@@ -126,7 +129,7 @@ loop version:
 The speed depends on the number of pixels in the image, not on the size of the volume. The
 grid of section 2 has the same cost per pixel and fewer rows. A second prototype of the grid
 gave the expected shapes for a triangle, an isosceles trapezoid, a rectangle and a slanted
-parallelogram. The final measurement is part of the experiment.
+parallelogram. The final measurements are in [EXPERIMENT.md](EXPERIMENT.md).
 
 ## 5. Validation of a plane
 

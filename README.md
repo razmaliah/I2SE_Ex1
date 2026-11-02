@@ -66,7 +66,8 @@ arguments.
 | `tests/` | Automated tests, run with `pytest` |
 | `prototype/` | The first loop-based prototype, kept for history |
 | `docs/` | SRS, algorithm, data set, test strategy, experiment |
-| `demo/` | Demo CSV files and output videos |
+| `demo/` | Demo CSV files; result videos in `demo/results/` |
+| `tools/` | Benchmark script for the experiment |
 | `data/` | NRRD files (not committed, see `docs/DATASET.md`) |
 
 ## Documents
@@ -76,11 +77,13 @@ arguments.
 - [Design](docs/DESIGN.md)
 - [Data set](docs/DATASET.md)
 - [Test strategy](docs/TESTING.md)
-- Experiment and results – in progress
+- [Experiment and results](docs/EXPERIMENT.md)
 
 ## Status
 
-Implementation complete, with tests. Next: the experiment.
+Complete: implementation, 113 tests and the experiment. On a 500³ volume the program runs at
+about 150 – 200 projection FPS and 116 FPS end to end, on a 2-core cloud machine
+([results](docs/EXPERIMENT.md)).
 
 ## Setup
 
