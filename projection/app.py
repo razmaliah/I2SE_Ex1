@@ -61,13 +61,14 @@ class ProjectionApp:
         # 3. Project every plane into frames of one size and write the video.
         shape = frame_shape([entry.plane.image_shape for entry in entries if entry.valid])
         black = np.zeros(shape, dtype=np.uint8)
+        buffer = np.zeros(shape, dtype=np.uint8)       # reused for every frame
         projection_seconds = 0.0
         start = time.perf_counter()
         with VideoWriter(video_path, shape, self.fps) as writer:
             for entry in entries:
                 frame_start = time.perf_counter()
                 if entry.valid:
-                    frame = place(self.projector.project(mapped, entry.plane), shape)
+                    frame = place(self.projector.project(mapped, entry.plane), shape, buffer)
                 else:
                     frame = black
                 projection_seconds += time.perf_counter() - frame_start

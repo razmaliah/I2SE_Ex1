@@ -54,15 +54,23 @@ class FastProjector(Projector):
         y = np.arange(g.rows, dtype=float)[:, None]               # column of row numbers
         x = np.arange(g.cols, dtype=float)[None, :]               # row of column numbers
 
-        offset = np.zeros((g.rows, g.cols), dtype=np.intp)
+        # Work arrays are reused and filled in place, so each pixel costs few memory passes.
+        # int32 is enough for offsets: the padded volume has at most 1025³ < 2³¹ voxels.
+        shape = (g.rows, g.cols)
+        coordinate = np.empty(shape)
+        index = np.empty(shape, dtype=np.int32)
+        offset = np.zeros(shape, dtype=np.int32)
         for k in range(3):                                         # one coordinate at a time
-            coordinate = (g.origin[k] + y * g.down[k]) + x * g.across[k]
-            index = np.rint(coordinate).astype(np.intp) + 1        # +1 for the zero border
-            np.clip(index, 0, volume.shape[k] + 1, out=index)      # outside -> zero border
-            offset += index * strides[k]
+            np.multiply(x, g.across[k], out=coordinate)
+            coordinate += g.origin[k] + y * g.down[k]              # origin + y·down + x·across
+            np.rint(coordinate, out=coordinate)                    # nearest voxel (FR-17)
+            np.clip(coordinate, -1, volume.shape[k], out=coordinate)   # outside -> border
+            index[...] = coordinate
+            index += 1                                             # +1 for the zero border
+            index *= int(strides[k])
+            offset += index
 
         left, right = g.row_bounds(y)
-        in_shape = (x >= left - EPS) & (x <= right + EPS)
-        offset[~in_shape] = 0                                      # corner of the zero border
+        offset[(x < left - EPS) | (x > right + EPS)] = 0           # margin: corner of the border
 
         return padded.ravel()[offset]
