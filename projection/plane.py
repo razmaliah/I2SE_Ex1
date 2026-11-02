@@ -87,7 +87,7 @@ class Plane(ABC):
         if rows > max_side or cols > max_side:
             raise InvalidPlaneError(
                 f"image of {rows} x {cols} pixels is larger than the maximum "
-                f"of {max_side} (twice the volume diagonal)"
+                f"of {max_side:.0f} (twice the volume diagonal)"
             )
 
     @abstractmethod
