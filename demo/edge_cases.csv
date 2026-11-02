@@ -1,0 +1,47 @@
+Number of Points (3 or 4),x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4
+# Edge cases for data/MRHead_1.nrrd (256 x 256 x 130 voxels, diagonal 384.8).
+# python Ex0.py data/MRHead_1.nrrd demo/edge_cases.csv demo/output/edge_cases.mp4
+# Expected (SRS): 18 frames. Frames 5 to 16 are black: frame 5 without a warning,
+# frames 6 to 16 with a warning listing their line numbers. The run continues.
+#
+# --- valid planes ---
+# frame 1: slice z = 65 (the middle of the head, sagittal) as a rectangle (FR-14)
+4,0,0,65,255,0,65,0,255,65,255,255,65
+# frame 2: oblique isosceles triangle through the head
+3,128,40,20,60,200,110,196,200,110,,,
+# frame 3: slanted parallelogram on z = 65, drawn slanted (FR-18)
+4,20,40,65,200,100,65,20,200,65,200,260,65
+# frame 4: triangle partly outside the volume, black where it leaves (FR-13)
+3,-60,128,65,200,-20,65,200,276,65,,,
+# frame 5: valid triangle completely outside the volume: black, no warning (FR-13)
+3,400,10,10,450,0,10,450,20,10,,,
+#
+# --- invalid planes: black frame and a warning (FR-9, FR-11) ---
+# frame 6: triangle not isosceles
+3,128,40,20,60,200,110,196,210,110,,,
+# frame 7: points on one line
+3,10,10,10,0,0,0,20,20,20,,,
+# frame 8: b and c are the same point
+3,0,0,0,10,10,10,10,10,10,,,
+# frame 9: a value that is not a number
+3,128,40,abc,60,200,110,196,200,110,,,
+# frame 10: an infinite value
+3,128,40,inf,60,200,110,196,200,110,,,
+# frame 11: number of points is not 3 or 4
+5,128,40,20,60,200,110,196,200,110,,,
+# frame 12: 4 points but only 9 numbers
+4,128,40,20,60,200,110,196,200,110,,,
+# frame 13: trapezoid with unequal legs
+4,0,40,65,200,0,65,0,200,65,200,250,65
+# frame 14: trapezoid whose top is longer than its base
+4,0,0,65,200,40,65,0,250,65,200,210,65
+# frame 15: legs cross (a1 and a2 swapped)
+4,20,180,65,200,20,65,20,80,65,200,240,65
+# frame 16: image larger than twice the volume diagonal (FR-19a)
+3,0,128,65,300,-272,65,300,528,65,,,
+#
+# --- valid again: the run continued ---
+# frame 17: the same oblique triangle as frame 2
+3,128,40,20,60,200,110,196,200,110,,,
+# frame 18: slice z = 65 again
+4,0,0,65,255,0,65,0,255,65,255,255,65
