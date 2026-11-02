@@ -13,7 +13,7 @@ such detail is decided here, with the reason for the decision.
 |---|---|
 | Volume | The 3D matrix `M[x][y][z]` read from the NRRD file |
 | Voxel | One entry of the volume |
-| Plane | One CSV row: a triangle (3 points) or a trapezoid (4 points) |
+| Plane | One CSV row: an isosceles triangle (3 points) or an isosceles trapezoid (4 points) |
 | Frame | The 2D image of one plane, one frame of the output video |
 | EPS | Tolerance for geometric checks, `0.001` |
 
@@ -22,7 +22,10 @@ such detail is decided here, with the reason for the decision.
 ### 2.1 Volume (NRRD)
 
 - **FR-1** The program reads a 3D volume from an NRRD file.
-- **FR-2** Supported voxel types: unsigned 8, 16 and 32 bit integers.
+- **FR-2** Supported voxel types: 8, 16 and 32 bit integers, unsigned and signed.
+  - *Reason:* the assignment states unsigned values, but the MRI file it recommends
+    (`MRHead_1.nrrd`) is `short` (signed 16 bit). Signed values need no special handling, since
+    intensity mapping (FR-20) uses the actual range of the volume.
 - **FR-3** Supported sizes: `1 ≤ sx, sy, sz < 1024`.
 
 ### 2.2 Planes (CSV)
@@ -34,9 +37,8 @@ such detail is decided here, with the reason for the decision.
   - Triangle: `a, b, c`, where `a` is the apex and `b→c` is the base.
   - Trapezoid: `a1, b, a2, c`, where the legs are `a1→b` and `a2→c`, `a1→a2` is the top and
     `b→c` is the base.
-  - *Reason:* the order `a1, a2, b, c` written in the assignment's Q&A does not fit the
-    lecturer's own example (`lecturer_example.csv`, row 4): with it the legs are 300 and 400.
-    With `a1, b, a2, c` both legs are 502.49. Row 2 fits both orders.
+  - *Reason:* the points are listed leg by leg: each leg is given by its two end points, one
+    after the other. The lecturer's example (`lecturer_example.csv`) follows this order.
 - **FR-7** Coordinates are voxel indices, as real numbers. They may be outside the volume.
   - *Reason:* this is what the assignment's algorithm assumes, and it is simpler.
   - *Limitation:* NRRD voxels are not always cubes (e.g. 1 × 1 × 1.3 mm). For such volumes the
@@ -66,6 +68,10 @@ such detail is decided here, with the reason for the decision.
   7. Trapezoid: the four points are not on one plane (distance of `a2` from the plane of
      `a1, b, c` is `≥ EPS`).
   8. Trapezoid: the legs cross (the top and the base point in opposite directions).
+  9. The image of the plane is larger than the maximum frame size (FR-19a).
+  - *Note on item 6:* the algorithm itself would work with a top longer than the base (the image
+    would narrow toward the bottom). The plane is rejected because the assignment's definition
+    requires `dist(a1,a2) ≤ dist(b,c)`.
 - **FR-10** All planes are validated **before** any projection, and all errors are reported
   together, with their CSV line numbers. Example:
   `2 of 30 planes are invalid: line 4: triangle is not isosceles (|ab|=497.39, |ac|=476.86); line 8: value 'abc' is not a number`.
@@ -83,7 +89,8 @@ such detail is decided here, with the reason for the decision.
 ### 3.3 Not an error
 
 - **FR-13** A valid plane that is partly or completely outside the volume is not an error. The
-  parts outside the volume are black. No warning is printed.
+  parts outside the volume are black (output value 0, also for volumes with negative values).
+  No warning is printed.
 
 ## 4. Projection
 
@@ -106,6 +113,14 @@ such detail is decided here, with the reason for the decision.
 
 - **FR-19** All frames have the same size: the largest height and width over all valid planes.
   A smaller image is centered in the frame, with black margins.
+- **FR-19a** Maximum frame size: the height and the width of a plane's image may not exceed
+  **twice the diagonal of the volume**, `2·√(sx² + sy² + sz²)` (about 1732 for a 500³ volume).
+  A larger plane is invalid (FR-9).
+  - *Reason:* the part of any plane inside the volume is at most one diagonal long. A triangle
+    must be larger than the region it covers, because its corners are empty: to cover a full
+    slice it needs about twice the slice's size. Twice the diagonal is therefore enough for any
+    useful plane, and it is derived from the volume rather than chosen arbitrarily. Without a
+    limit, a valid plane far outside the volume could produce a frame thousands of pixels wide.
 
 ### 5.2 Intensity mapping
 
@@ -119,6 +134,10 @@ such detail is decided here, with the reason for the decision.
 
 - **FR-21** The video has one frame per CSV plane, in the CSV order.
 - **FR-22** The video is grayscale, in MP4 format.
+- **FR-22a** The playback rate is 10 frames per second by default, and can be changed from the
+  command line.
+  - *Reason:* a slower rate lets the viewer see each plane. This is the playback rate only; it
+    is not related to the projection speed (NFR-1).
 
 ### 5.4 Report
 
@@ -136,9 +155,3 @@ such detail is decided here, with the reason for the decision.
 - **NFR-3 Robustness:** no input may crash the program with an unhandled exception.
 - **NFR-4 Code quality:** object-oriented design, PEP 8, docstrings, automated tests.
 - **NFR-5 Environment:** Python 3.10+, with NumPy and common libraries for NRRD and MP4.
-
-## 7. Open questions
-
-- The playback rate of the output video (frames per second of the MP4 file).
-- A maximum frame size, for planes that extend far outside the volume (a valid plane can be
-  thousands of pixels wide).
