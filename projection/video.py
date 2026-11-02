@@ -14,9 +14,16 @@ def frame_shape(shapes):
     return rows + rows % 2, cols + cols % 2
 
 
-def place(image, shape):
-    """Center ``image`` in a black frame of ``shape`` (FR-19)."""
-    frame = np.zeros(shape, dtype=np.uint8)
+def place(image, shape, out=None):
+    """Center ``image`` in a black frame of ``shape`` (FR-19).
+
+    ``out``, if given, is a frame buffer that is cleared and reused instead of a new array.
+    """
+    if out is None:
+        frame = np.zeros(shape, dtype=np.uint8)
+    else:
+        frame = out
+        frame.fill(0)
     top = (shape[0] - image.shape[0]) // 2
     left = (shape[1] - image.shape[1]) // 2
     frame[top:top + image.shape[0], left:left + image.shape[1]] = image

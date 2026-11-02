@@ -76,7 +76,7 @@ The demo of the assignment (`python Ex0.py file.nrrd file.csv file.mp4`) is run 
 
 | Volume | Planes | What to look at |
 |---|---|---|
-| `MRHead_1.nrrd` | `lecturer_example.csv` | Valid planes drawn, the non-isosceles triangle black with a warning |
+| `croissant.nrrd` | `lecturer_example.csv` | Valid planes drawn, the non-isosceles triangle black with a warning |
 | `MRHead_1.nrrd` | `head.csv` | Anatomy looks right; axis-aligned frames match the slices in 3D Slicer |
 | `croissant.nrrd` | `croissant.csv` | Performance on 500³; planes partly outside the volume |
 | `onion`, `biscuit_cake`, `swiss_roll` | their CSVs | 8, 16 and 32 bit volumes |
