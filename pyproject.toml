@@ -7,3 +7,8 @@ requires-python = ">=3.10"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+filterwarnings = [
+    # pynrrd's writer (used only by the tests to create NRRD files) calls a deprecated
+    # datetime function; this is in the library, not in our code.
+    "ignore:datetime.datetime.utcnow:DeprecationWarning:nrrd.writer",
+]
