@@ -51,6 +51,9 @@ class VideoWriter:
             quality=8,
             macro_block_size=1,          # never resize: the size is already even
             ffmpeg_log_level="error",
+            # The fastest H.264 preset: the same image quality, about 10% larger files, and
+            # encoding is no longer the slowest step of the run (EXPERIMENT.md, section 4).
+            output_params=["-preset", "ultrafast"],
         )
         self._frames.send(None)          # start ffmpeg
         return self
