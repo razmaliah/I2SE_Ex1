@@ -82,7 +82,8 @@ arguments.
 ## Status
 
 Complete: implementation, 113 tests and the experiment. On a 500³ volume the program runs at
-about 250 projection FPS and 219 FPS end to end, on a 2-core cloud machine
+about 185 – 250 projection FPS and 155 – 219 FPS end to end (a laptop and a 2-core cloud
+machine)
 ([results](docs/EXPERIMENT.md)).
 
 ## Setup

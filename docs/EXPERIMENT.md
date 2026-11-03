@@ -105,9 +105,9 @@ median (machine A, measured before the encoder change; projection alone does not
 
 ### 4.3 Findings
 
-- **The requirement is met.** On the 500³ volume the projection runs at about 200 – 250 FPS and
-  the whole program, including the video, at 219 FPS on machine A, above the target of 100 and
-  far above the minimum of 30.
+- **The requirement is met.** On the 500³ volume the projection runs at about 185 – 250 FPS and
+  the whole program, including the video, at 155 – 219 FPS (machines B and A), above the target
+  of 100 and far above the minimum of 30.
 - **No loops: about 140 – 570 times faster.** The loop-based reference needs 0.3 – 0.7 s per
   frame (about 2 FPS); the fast projector gives the same images.
 - **Speed depends on the image size, not on the volume.** The 256 × 256 × 130 volumes run at about
@@ -142,6 +142,33 @@ compression effort for speed, at the same image quality (same quality setting). 
 
 `ultrafast` almost doubles the end-to-end speed for 12% larger files, so it is now the default
 (`projection/video.py`).
+
+**Machine B after the change**, on mains power with the *best performance* power mode:
+
+| Machine B, `croissant` | Load (s) | Projection FPS | End-to-end FPS |
+|---|---|---|---|
+| `Ex0.py`, `ultrafast` | 1.70 | **185** | **155** |
+| `tools/benchmark.py` (projection only) | 1.61 | 213 | – |
+| Same `Ex0.py` run on battery saver | 2.58 | 84 | 49 |
+
+| Machine B, random 500³ uint8 volume | Image | Projection FPS |
+|---|---|---|
+| Slice | 500 × 500 | 176 |
+| Diagonal triangle | 706 × 500 | 152 |
+| Triangle around a full slice | 1000 × 1000 | 51 |
+
+The loop reference needed 0.73 s per frame on machine B, so the fast projector is about 155 times
+faster there. Both targets are met on both machines. The battery saver run shows how much the
+measurement depends on the conditions: speeds must be measured on mains power, with other heavy
+programs closed.
+
+**Why the encoder slows the projection too.** Frames are sent to the encoder as soon as they are
+made (streaming): `ffmpeg` runs as a separate process and encodes in the background while the
+next frame is projected. The two compete for the same cores and memory, so the projection
+itself runs slower while the encoder is busy, and a lighter preset speeds up both numbers.
+Encoding at the end instead would keep every frame in memory (a long plane list could need
+gigabytes) and would remove the overlap of the two, so the end-to-end time would be longer.
+`tools/benchmark.py` measures the projection without the encoder.
 
 ## 5. Intensity mapping
 
