@@ -11,9 +11,10 @@
 
 - **Data:** the data set of [DATASET.md](DATASET.md): `MRHead_1.nrrd` and the class volumes,
   with their CSV files, the lecturer's example and our `demo/edge_cases.csv`.
-- **Machine:** a cloud machine with 2 cores of an Intel Xeon at 2.1 GHz. This is a slow machine;
-  on a modern laptop the numbers should be higher.
-- **Software:** Python 3.13, NumPy 2.5, pynrrd 1.1, imageio-ffmpeg 0.6.
+- **Machines:** (A) a cloud machine with 2 cores of an Intel Xeon at 2.1 GHz, Linux, Python 3.13;
+  (B) the author's Windows laptop, Python 3.15 (section 4.4).
+- **Software:** NumPy 2.5, pynrrd 1.1, imageio-ffmpeg 0.6. Video encoding uses the H.264
+  `ultrafast` preset (section 4.4).
 - **Commands:** `python Ex0.py <volume> <planes> <video>` for every pair, and
   `python tools/benchmark.py <volume>:<planes> ...` for repeated speed measurements.
 
@@ -68,22 +69,25 @@ loop-based reference on 240 random planes over all six voxel types (NFR-2).
 
 ### 4.1 The demo program
 
-Reported by `Ex0.py`. *Projection FPS* counts projecting and placing each frame; *end-to-end FPS*
-also counts writing the video; *load* is reading the volume and mapping it to 8 bit (FR-23).
+Reported by `Ex0.py` on machine A. *Projection FPS* counts projecting and placing each frame;
+*end-to-end FPS* also counts writing the video; *load* is reading the volume and mapping it to
+8 bit (FR-23).
 
 | Volume | Planes | Frames | Frame size | Load (s) | Projection FPS | End-to-end FPS |
 |---|---|---|---|---|---|---|
-| croissant (500³, uint8) | croissant.csv | 100 | 502 × 502 | 1.51 | **146** | **116** |
-| MRHead_1 (int16) | head.csv | 280 | 256 × 256 | 0.19 | 654 | 365 |
-| onion (uint8) | onion.csv | 120 | 256 × 256 | 0.16 | 728 | 266 |
-| biscuit_cake (uint16) | biscuit_cake.csv | 120 | 256 × 256 | 0.18 | 757 | 314 |
-| swiss_roll (uint32) | swiss_roll.csv | 120 | 256 × 256 | 0.30 | 792 | 305 |
+| croissant (500³, uint8) | croissant.csv | 100 | 502 × 502 | 1.54 | **249** | **219** |
+| MRHead_1 (int16) | head.csv | 280 | 256 × 256 | 0.16 | 1136 | 908 |
+| onion (uint8) | onion.csv | 120 | 256 × 256 | 0.69 | 1088 | 699 |
+| biscuit_cake (uint16) | biscuit_cake.csv | 120 | 256 × 256 | 0.95 | 1115 | 777 |
+| swiss_roll (uint32) | swiss_roll.csv | 120 | 256 × 256 | 1.73 | 1135 | 708 |
+
+Load times include reading the compressed NRRD file from disk, so they vary with the disk cache:
+the second run of `croissant` loaded in 1.5 s, the first in 11 s.
 
 ### 4.2 Projection only (benchmark)
 
 `tools/benchmark.py` projects every plane three times without writing a video, and reports the
-median. On this 2-core machine, the video encoder runs at the same time as the projection in
-`Ex0.py` and takes one core, which is why the projection alone is faster here.
+median (machine A, measured before the encoder change; projection alone does not depend on it).
 
 | Volume | Planes | Mean image (pixels) | Projection FPS | Loop reference (s per frame) |
 |---|---|---|---|---|
@@ -101,9 +105,9 @@ median. On this 2-core machine, the video encoder runs at the same time as the p
 
 ### 4.3 Findings
 
-- **The requirement is met.** On the 500³ volume the projection runs at 146 – 206 FPS and the
-  whole program, including the video, at 116 FPS, above the target of 100 and far above the
-  minimum of 30, even on a slow 2-core machine.
+- **The requirement is met.** On the 500³ volume the projection runs at about 200 – 250 FPS and
+  the whole program, including the video, at 219 FPS on machine A, above the target of 100 and
+  far above the minimum of 30.
 - **No loops: about 140 – 570 times faster.** The loop-based reference needs 0.3 – 0.7 s per
   frame (about 2 FPS); the fast projector gives the same images.
 - **Speed depends on the image size, not on the volume.** The 256 × 256 × 130 volumes run at about
@@ -114,6 +118,30 @@ median. On this 2-core machine, the video encoder runs at the same time as the p
 - **Two optimizations mattered most:** the zero border around the volume (no per-pixel bounds
   test), and mapping the volume to 8 bit once at load time (FR-20), so the projector reads one
   byte per pixel. Working in place with 32-bit offsets added about 60%.
+- **The video encoder decides the end-to-end speed.** See section 4.4.
+
+### 4.4 Video encoding and the author's laptop
+
+The first measurements on the author's laptop (machine B) met the projection target but not
+the end-to-end target:
+
+| Machine B, `croissant` | Load (s) | Projection FPS | End-to-end FPS |
+|---|---|---|---|
+| `Ex0.py`, default H.264 preset | 2.03 | 120 | **80** |
+| `tools/benchmark.py` (projection only) | 1.85 | 185 | – |
+
+All of the gap was in writing the video: the encoder used most of the time, and since it runs in
+parallel with the projection it also slowed the projection down. H.264 offers presets that trade
+compression effort for speed, at the same image quality (same quality setting). On machine A, for
+`croissant`:
+
+| Preset | Projection FPS | End-to-end FPS | File size |
+|---|---|---|---|
+| default | 146 | 116 | 5.7 MB |
+| `ultrafast` | 249 | **219** | 6.4 MB (+12%) |
+
+`ultrafast` almost doubles the end-to-end speed for 12% larger files, so it is now the default
+(`projection/video.py`).
 
 ## 5. Intensity mapping
 

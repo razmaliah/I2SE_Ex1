@@ -148,7 +148,8 @@ such detail is decided here, with the reason for the decision.
 ### 5.3 Video
 
 - **FR-21** The video has one frame per CSV plane, in the CSV order.
-- **FR-22** The video is grayscale, in MP4 format (H.264). The frame height and width are
+- **FR-22** The video is grayscale, in MP4 format (H.264, `ultrafast` preset: fastest encoding at
+  the same image quality, see EXPERIMENT.md section 4.4). The frame height and width are
   rounded up to even numbers, which the format requires; the extra row or column is black.
 - **FR-22a** The playback rate is 10 frames per second by default, and can be changed from the
   command line.
